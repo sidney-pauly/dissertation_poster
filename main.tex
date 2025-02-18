@@ -86,18 +86,27 @@
 
 \begin{frame}[t]
 
-  \begin{block}{Abstract}
-    \textbf{Context}: In modern distribution grids electricity is both produced and consumed on a local level.
-    Unlike in the past when energy usually flowed from the transformer to the consumers, nowadays, electricity
-    may be produced and consumed within the same grid. This leads to complex powerflow within the distribution
-    grids. Venios simulates these grids (in real time) using measurement data, prediction algorithms and whether
-    forecasts. Using this "digital twin" of the grid computational studies for improvements of the grid
-    can be performed. Improvements desirable for the grid operator might aim at getting a lower overall utilization, higher
-    grid stability, lower operating costs or lower expansion costs among others\autocite{Venios}.\\
-    \textbf{Aims}: The aim of this project is to explore the effects of connecting or disconnecting different
-    sub islands of the grids with each other/from each other. Once these effects are established am algorithm
-    finding the optimal switch states can be developed.
-  \end{block}
+  \begin{columns}[t]
+
+    \begin{column}{\colwidth*2}
+
+
+      \begin{block}{Abstract}
+        In modern distribution grids electricity is both produced and consumed on a local level.
+        Unlike in the past when energy usually flowed from the transformer to the consumers, nowadays, electricity
+        may be produced and consumed within the same grid. This leads to complex powerflow within the distribution
+        grids. Venios simulates these grids (in real time) using measurement data, prediction algorithms and whether
+        forecasts. Using this "digital twin" of the grid computational studies for improvements of the grid
+        can be performed. Improvements desirable for the grid operator might aim at getting a lower overall utilization, higher
+        grid stability, lower operating costs or lower expansion costs among others\autocite{Venios}.
+        The aim of this project is to explore the effects of connecting or disconnecting different
+        sub islands of the grids with each other/from each other. Once these effects are established am algorithm
+        finding the \textbf{optimal switch states} can be developed.
+      \end{block}
+
+    \end{column}
+
+  \end{columns}
 
 \begin{columns}[t]
 
@@ -106,7 +115,7 @@
 
 \begin{column}{\colwidth}
 
-  \begin{block}{The grid}
+  \begin{block}{Model: the grid}
 
     \begin{figure}
       \centering
@@ -137,7 +146,7 @@
 
   \end{alertblock}
 
-  \begin{alertblock}{Complex valued formulation}
+  \begin{alertblock}{Model: complex valued formulation}
     \begin{columns}[t]
       
       \begin{column}{\colwidth/20*5}
@@ -172,13 +181,14 @@
               &\text{Reactive (imaginary part):}   &Q       &= |V||I| \sin{\theta} = V_m I_m\sin{\theta}\\
               &\text{Power factor:}     &P_f     &= \cos{\theta}
           \end{aligned}
+          \label{eq:complex_power}
         \end{equation}
       \end{column}
 
     \end{columns}
   \end{alertblock}
 
-  \begin{block}{Powerflow}
+  \begin{block}{Model: powerflow}
     
 
     Solving power flow means figuring out the voltage at each node and the
@@ -207,6 +217,7 @@
           &\text{Ohm's law}: \ \ & V   &= Z I \\
           &\text{Powerflow}: \ \ & I_i &= V_i \sum_{j=0}^n y_{ij} - \sum_{j=1}^n y_{ij} V_j = \frac{S_i^*}{V_i^*} \quad i \neq j
         \end{aligned}
+        \label{eq:}
       \end{equation}
       
     \end{column}
@@ -214,6 +225,10 @@
   \end{columns}
 
   \vspace{1cm}
+
+
+  Equatiom, as $V_i$ appears on both sides it is non-linear and
+  can only be solved computationally
 
   To solve power flow each node in the grid is modelled as one of two types:
 
@@ -226,13 +241,11 @@
     \end{tabular}
   \end{center}
 
-  This results in a system of equations, as $V_i$ appears on both sides it is non-linear and
-  can only be solved computationally
 
   \end{block}
 
 
-  \begin{block}{Interacting with VEP}
+  \begin{block}{Method: interacting with VEP}
 
     \begin{figure}
       \centering
@@ -268,7 +281,7 @@
         \node             [below= 1mm of c_kernel]   {Powerflow};
 
         \draw [-{Latex[length=5mm]}, line width = 1mm] (vep.north) to [bend left=30, edge label=Api] (my_module.north west);
-        \draw [-{Latex[length=5mm]}, line width = 1mm] (my_module.south west) to [bend left=30, edge label=Optimal switch state] (vep.south);
+        \draw [-{Latex[length=5mm]}, line width = 1mm] (my_module.south west) to [bend left=30, edge label=\textbf{Optimal switch state}] (vep.south);
 
 
       \end{tikzpicture}
@@ -283,7 +296,7 @@
 
 \begin{column}{\colwidth}
 
-  \begin{block}{Solving powerflow}
+  \begin{block}{Method: solving powerflow}
     
     \begin{itemize}
       \item \textbf{Gauss Seidel}: Easy to implement, but slow and bad convergence
@@ -291,29 +304,34 @@
     \end{itemize}
   
   
-    \begin{columns}[t]
+    % \begin{columns}[t]
+
+      \begin{figure}
+        \input{newton_raphson.tex}
+        \includegraphics[width=18cm]{./img/graphs/convergance.png}
+
+        \caption{Illustration of Newton Raphson method (left); Convergence speed of two tested power flow solvers in log scale (right)}
+      \end{figure} 
         
-      \begin{column}{\colwidth/20*9}
+      % \begin{column}{\colwidth/20*9}
   
-        \begin{figure}
-          \centering
-          \input{newton_raphson.tex}
-          % \caption{Illustration of Newton Raphson method for simple fuction}
-        \end{figure}
+      %   \begin{figure}
+      %     \centering
+      %     % \caption{Illustration of Newton Raphson method for simple fuction}
+      %   \end{figure}
   
-      \end{column}
+      % \end{column}
   
-      \begin{column}{\colwidth/20*9}
+      % \begin{column}{\colwidth/20*9}
   
-        \begin{figure}
-          \centering
-          \includegraphics[width=18cm]{./img/graphs/convergance.png}
-          % \caption{Comparing Gauss Seidel and Newton Raphson powerflow convergance}
-        \end{figure}
+      %   \begin{figure}
+      %     \centering
+      %     % \caption{Comparing Gauss Seidel and Newton Raphson powerflow convergance}
+      %   \end{figure}
   
-      \end{column}
+      % \end{column}
   
-    \end{columns}
+    % \end{columns}
 
  \end{block}
 
@@ -325,7 +343,13 @@
     \\[\smallskipamount]
     \includegraphics[width=.48\textwidth]{img/graphs/rural1/voltage.png}\hfill
     \includegraphics[width=.48\textwidth]{img/graphs/rural1/cable_utilization.png}\hfill
-    \caption{Results of powerflow simulation of SimBench Grid "1-LV-rural1"\autocite{en13123290} using Newton Raphson }\label{fig:foobar}
+    \caption{Results of powerflow simulation of a life-like synthetic German grid\autocite{en13123290} using Newton Raphson.
+      Real Power $P$ (eq. \ref{eq:complex_power}) of each node (top left);
+      Reactive Power $Q$ (eq. \ref{eq:complex_power}) of each node (top right);
+      Node voltage (eq. \ref{eq:complex_power}) (bottom left);
+      Node voltage (eq. \ref{eq:complex_power}) (bottom left);
+      Cable utilization factor $\frac{I_{max}}{I}$ (bottom right)
+      }\label{fig:foobar}
   \end{figure}  
 
  \end{block}
@@ -359,9 +383,9 @@
     
   \end{exampleblock}
 
- \begin{block}{Outlook}
+ \begin{block}{Challanges and Solutions}
  
-  To find optimal (or even improved switch states), two challenges need to be: what
+  To find \textbf{optimal} (or even improved) \textbf{switch states}, two challenges emerge: what
   does \textit{improved} mean and which configurations should be considered?
 
   \begin{columns}[t]
@@ -375,7 +399,7 @@
           \item Overall line losses
           \item Utilization of cables
           \item Utilization of transformers
-          \item Number of trafos
+          \item Number of transformers
           \item Voltage stability
           \item Expandability robustness
         \end{itemize}
